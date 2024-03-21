@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookmark Manager</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        #bookmarkList {
+            list-style: none;
+            padding: 0;
+        }
+        #bookmarkList li {
+            margin-bottom: 10px;
+        }
+        .bookmark {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .bookmark a {
+            text-decoration: none;
+            color: #333;
+        }
+        .bookmark a:hover {
+            color: #007bff;
+        }
+        .bookmark button {
+            border: none;
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .bookmark button:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bookmark Manager</h1>
+        <form id="bookmarkForm">
+            <input type="text" id="siteName" placeholder="Enter site name" required>
+            <input type="url" id="siteURL" placeholder="Enter site URL" required>
+            <button type="submit">Add Bookmark</button>
+        </form>
+        <h2>Your Bookmarks</h2>
+        <ul id="bookmarkList"></ul>
+    </div>
+
+    <script>
+        // Function to handle form submission
+        function addBookmark(e) {
+            e.preventDefault();
+            const siteName = document.getElementById('siteName').value;
+            const siteURL = document.getElementById('siteURL').value;
+            const bookmark = {
+                name: siteName,
+                url: siteURL
+            };
+            let bookmarks = [];
+            if (localStorage.getItem('bookmarks') !== null) {
+                bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+            }
+            bookmarks.push(bookmark);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            displayBookmarks();
+            document.getElementById('bookmarkForm').reset();
+        }
+
+        // Function to display bookmarks
+        function displayBookmarks() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+            const bookmarkList = document.getElementById('bookmarkList');
+            bookmarkList.innerHTML = '';
+            if (bookmarks !== null) {
+                bookmarks.forEach(bookmark => {
+                    const li = document.createElement('li');
+                    li.className = 'bookmark';
+                    li.innerHTML = `
+                        <a href="${bookmark.url}" target="_blank">${bookmark.name}</a>
+                        <button onclick="deleteBookmark('${bookmark.url}')">Delete</button>
+                    `;
+                    bookmarkList.appendChild(li);
+                });
+            }
+        }
+
+        // Function to delete bookmark
+        function deleteBookmark(url) {
+            let bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
+            bookmarks = bookmarks.filter(bookmark => bookmark.url !== url);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            displayBookmarks();
+        }
+
+        // Event listener for form submission
+        document.getElementById('bookmarkForm').addEventListener('submit', addBookmark);
+
+        // Display bookmarks on page load
+        displayBookmarks();
+    </script>
+</body>
+</html>
